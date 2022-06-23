@@ -6,7 +6,7 @@ const initInput = (bindElement: HTMLElement): ((value: string) => void) => {
   };
   const input = <HTMLInputElement>bindElement.querySelector(`.${className.input}`);
   const setValue = (value: string): void => {
-    input.value = value;
+    input.innerHTML = value;
   };
   return setValue;
 };

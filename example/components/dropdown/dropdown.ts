@@ -31,3 +31,5 @@ const initDropdown = (bindElement: HTMLElement): ViewConnector => {
     defaultItem: defaultItem,
   };
 };
+
+export default initDropdown

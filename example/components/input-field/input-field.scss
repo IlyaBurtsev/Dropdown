@@ -24,16 +24,12 @@ $dark-25: rgba(31, 32, 65, 0.25);
 		width: 100%;
     padding-left: 1.4rem;
     color: $dark-75;
-    outline: transparent;
     border: 0.1rem solid $dark-25;
     box-sizing: border-box;
     border-radius: 0.4rem;
 		border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     align-items: center;
-    &::placeholder {
-      color: $dark-75;
-    }
     &:hover,
     &:focus,
     &:focus-visible {

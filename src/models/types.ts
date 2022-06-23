@@ -1,3 +1,4 @@
+import PluginActions from './enums/PluginActions';
 import ViewConnector from './ViewConnector';
 
 type UserOptionsType = string | number | Array<number> | Array<string> | boolean | undefined;
@@ -33,6 +34,9 @@ type DefaultItemDomOptions = {
 
 type DropdownDomOptions = {
   viewConnector: ViewConnector;
+	getEventNames: () => Actions,
+	trigger: (actions: PluginActions, ...args: Array<Object>) => void,
+	onChangeStateSubscriber: (handler: (state?: RootState, id?: number) => void) => void;
 };
 
 type Actions = {

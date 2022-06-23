@@ -1,10 +1,12 @@
 import ChangeStateTypes from '../models/enums/ChangeStateTypes';
+import PluginActions from '../models/enums/PluginActions';
 import { DropdownOptions, UserOptions } from '../models/interfaces';
 import { Actions, ItemDefaultState, RootState } from '../models/types';
 import { deepMerge } from './utils/utils';
 
 class DataController {
-  private rootState: RootState;
+  private numberOfDefaultItems: number;
+  private trigger: (actions: PluginActions, ...args: Array<Object>) => void;
   private options: DropdownOptions = {
     titlePlaceholder: '',
     minValueItem: 0,
@@ -17,9 +19,10 @@ class DataController {
   private actions: Actions = {
     onClick: 'click',
   };
-  constructor(userOptions?: UserOptions) {
+  constructor(trigger: (actions: PluginActions, ...args: Array<Object>) => void, userOptions?: UserOptions) {
     this.updateOptions(userOptions);
-    this.rootState = this.initState();
+    this.numberOfDefaultItems = this.setNumberOfDefaultItems();
+    this.trigger = trigger;
   }
 
   public getActions = (): Actions => {
@@ -27,25 +30,29 @@ class DataController {
   };
 
   public getNumberOfDefaultItems = (): number => {
-    return this.rootState.defaultStates.length;
+    return this.numberOfDefaultItems;
   };
 
-  public changeState = (type: ChangeStateTypes, state: RootState, id: number): RootState => {
-    if (id === -1) {
+  public changeState = (type: ChangeStateTypes, state: RootState, id?: number): RootState => {
+    if (id === undefined) {
       return state;
     }
-		let newState: RootState = state;
+    let newState: RootState = state;
     const { incrementStep } = this.options;
     const { defaultStates } = newState;
-    
+
     switch (type) {
       case ChangeStateTypes.addButtonClicked: {
         defaultStates[id].value += incrementStep;
-				return newState
+				defaultStates[id] = this.checkState(defaultStates[id])
+        this.trigger(PluginActions.onChangeState, newState, id);
+        return newState;
       }
       case ChangeStateTypes.subButtonClicked: {
         defaultStates[id].value -= incrementStep;
-				return newState
+				defaultStates[id] = this.checkState(defaultStates[id])
+        this.trigger(PluginActions.onChangeState, newState, id);
+        return newState;
       }
     }
     return state;
@@ -56,7 +63,26 @@ class DataController {
     }
   };
 
-  private initState = (): RootState => {
+  private setNumberOfDefaultItems = (): number => {
+    const { itemNames } = this.options;
+    if (Array.isArray(itemNames)) {
+      return itemNames.length;
+    } else {
+      return 1;
+    }
+  };
+  private checkState = (defaultState: ItemDefaultState): ItemDefaultState => {
+    const { minValue, maxValue, value } = defaultState;
+    if (value < minValue) {
+      defaultState.value = minValue;
+    }
+    if (value > maxValue) {
+      defaultState.value = maxValue;
+    }
+    return defaultState;
+  };
+
+  public initState = (): RootState => {
     const { itemNames, startValues, minValueItem, maxValueItem, titlePlaceholder } = this.options;
     const itemStates: Array<ItemDefaultState> = [];
 

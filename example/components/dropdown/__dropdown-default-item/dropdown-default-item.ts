@@ -14,7 +14,7 @@ const initDefaultItem = (bindElement: HTMLElement): DefaultItem => {
   }
 
   const setValue = (value: string, parentElement: HTMLElement): void => {
-    const counter = <HTMLInputElement>parentElement.querySelector(`.${className.defaultItemContainer}`);
+    const counter = <HTMLInputElement>parentElement.querySelector(`.${className.counter}`);
     if (counter !== null) {
       counter.value = value;
     }
@@ -23,7 +23,7 @@ const initDefaultItem = (bindElement: HTMLElement): DefaultItem => {
   const setItemName = (name: string, parentElement: HTMLElement): void => {
 		const title = <HTMLInputElement>parentElement.querySelector(`.${className.title}`);
     if (title !== null) {
-      title.value = name;
+      title.innerHTML = name;
     }
 	};
   return {

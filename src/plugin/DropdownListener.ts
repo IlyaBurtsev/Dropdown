@@ -28,10 +28,10 @@ class DropdownListener {
     if (!result) {
       return;
     } else {
-      if (result instanceof Touch) {
-        element = result.target as HTMLElement;
-      } else {
+      if (result === true) {
         element = event.target as HTMLElement;
+      } else {
+        element = result.target as HTMLElement;
       }
     }
     this.detectEvent(element);
@@ -43,13 +43,13 @@ class DropdownListener {
       if (element.getAttribute('id') !== null) {
         id = Number(element.getAttribute('id'))
       }
-      this.trigger(PluginActions.onChangeState, ChangeStateTypes.addButtonClicked, id);
+      this.trigger(PluginActions.onClickAddButton, id);
     }
     if (element.classList.contains(this.subButtonClassName)) {
 			if (element.getAttribute('id') !== null) {
         id = Number(element.getAttribute('id'))
       }
-      this.trigger(PluginActions.onChangeState, ChangeStateTypes.subButtonClicked, id);
+      this.trigger(PluginActions.onClickSubButton, id);
     }
   };
 }

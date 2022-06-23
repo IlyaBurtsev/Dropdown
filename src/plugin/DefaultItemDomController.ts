@@ -6,9 +6,9 @@ class DefaultItemDomController {
   private defaultItem: DefaultItem;
   constructor(options: DefaultItemDomOptions) {
     const { onDestroySubscriber, onChangeStateSubscriber, viewConnector } = options;
-    const { defaultItem: defaulItem } = viewConnector;
+    const { defaultItem } = viewConnector;
+		this.defaultItem = defaultItem;
     this.itemElements = this.initItems(options);
-    this.defaultItem = defaulItem;
     onChangeStateSubscriber(this.onChangeState);
     onDestroySubscriber(this.onDestroy);
   }
@@ -36,10 +36,10 @@ class DefaultItemDomController {
     return elements;
   };
 
-  private onChangeState = (state: RootState, id: number): void => {
+  private onChangeState = (state: RootState, id?: number): void => {
     const { setValue, setItemName } = this.defaultItem;
     const { defaultStates } = state;
-    if (id === -1) {
+    if (id === undefined) {
       this.itemElements.forEach((item, index) => {
         setItemName(`${defaultStates[index].itemName}`, item);
         setValue(`${defaultStates[index].value}`, item);

@@ -1,14 +1,22 @@
-import { DefaultItem, DefaultItemDomOptions, RootState } from '../models/types';
+import PluginActions from '../models/enums/PluginActions';
+import { DefaultItem, DefaultItemDomOptions, Payload, RootState } from '../models/types';
 import { removeElementsFromDom } from './utils/utils';
 
 class DefaultItemDomController {
   private itemElements: Array<HTMLElement>;
   private defaultItem: DefaultItem;
+  private trigger: (actions: PluginActions, ...args: Array<Object>) => void;
   constructor(options: DefaultItemDomOptions) {
-    const { onDestroySubscriber, onChangeStateSubscriber, viewConnector } = options;
+    const {
+      onDestroySubscriber,
+      onChangeStateSubscriber,
+      viewConnector,
+      trigger,
+    } = options;
     const { defaultItem } = viewConnector;
-		this.defaultItem = defaultItem;
+    this.defaultItem = defaultItem;
     this.itemElements = this.initItems(options);
+    this.trigger = trigger;
     onChangeStateSubscriber(this.onChangeState);
     onDestroySubscriber(this.onDestroy);
   }
@@ -36,17 +44,22 @@ class DefaultItemDomController {
     return elements;
   };
 
-  private onChangeState = (state: RootState, id?: number): void => {
+  private onChangeState = (state: RootState, payload: Payload): void => {
     const { setValue, setItemName } = this.defaultItem;
     const { defaultStates } = state;
-    if (id === undefined) {
+    const { init, id } = payload;
+
+    if (init === true) {
       this.itemElements.forEach((item, index) => {
         setItemName(`${defaultStates[index].itemName}`, item);
         setValue(`${defaultStates[index].value}`, item);
       });
     } else {
-      const item = this.itemElements[id];
-      setValue(`${defaultStates[id].value}`, item);
+      if (id !== undefined) {
+        const item = this.itemElements[id];
+				setItemName(`${defaultStates[id].itemName}`, item);
+        setValue(`${defaultStates[id].value}`, item);
+      }
     }
   };
 

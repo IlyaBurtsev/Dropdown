@@ -1,4 +1,4 @@
-import { DropdownDomOptions, RootState } from '../models/types';
+import { DropdownDomOptions, Payload, RootState } from '../models/types';
 import DropdownListener from './DropdownListener';
 
 class DropdownDomController {
@@ -23,10 +23,16 @@ class DropdownDomController {
     onChangeStateSubscriber(this.onChangeState);
   }
 
-  private onChangeState = (state: RootState): void => {
-    const { title } = state;
-    this.setValueToInput(title);
-    this.onChangeStateSubscriber(this.onChangeState, false);
+  private onChangeState = (state: RootState, payload: Payload): void => {
+		const {title, init} = payload
+		if (init === true) {
+			const { title } = state;
+			this.setValueToInput(title);
+		}else {
+			if (title !== undefined) {
+				this.setValueToInput(title)
+			}
+		}
   };
 
   private onFocus = (e: MouseEvent): void => {

@@ -4,6 +4,8 @@ enum PluginActions {
   onClickAddButton = 'onClickAddButton',
 	onClickSubButton = 'onClickSubButton',
   onChangeState = 'onChangeState',
+	onChangeTitle = 'onChangeTitle',
+	onChangeDefaultItemParametrs = 'onChangeDefaultItem',
   onDestroy = 'onDestroy',
 }
 

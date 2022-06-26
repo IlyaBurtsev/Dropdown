@@ -1,14 +1,17 @@
 import PluginActions from './enums/PluginActions';
+import { ItemDefaultParametrs, ItemDefaultState } from './interfaces';
 import ViewConnector from './ViewConnector';
 
-type UserOptionsType = string | number | Array<number> | Array<string> | boolean | undefined;
+type UserOptionsType =
+  | string
+  | number
+  | Array<number>
+  | Array<string>
+  | boolean
+  | ((state: RootState, id: number) => RootState)
+  | undefined;
 
-type ItemDefaultState = {
-  itemName: string;
-  minValue: number;
-  maxValue: number;
-  value: number;
-};
+type ItemDefaultParametrsType = string | number | undefined;
 
 type RootState = {
   title: string;
@@ -28,31 +31,40 @@ type ItemValueType = number;
 type DefaultItemDomOptions = {
   viewConnector: ViewConnector;
   numberOfItems: number;
+  trigger: (actions: PluginActions, ...args: Array<Object>) => void;
   onDestroySubscriber: (handler: () => void) => void;
-	onChangeStateSubscriber: (handler: (state?: RootState, id?: number) => void) => void;
+  onChangeStateSubscriber: (handler: (state?: RootState, payload?: Payload) => void) => void;
 };
 
 type DropdownDomOptions = {
   viewConnector: ViewConnector;
-	getEventNames: () => Actions,
-	trigger: (actions: PluginActions, ...args: Array<Object>) => void,
-	onChangeStateSubscriber: (handler: (state?: RootState, id?: number) => void) => void;
+  getEventNames: () => Actions;
+  trigger: (actions: PluginActions, ...args: Array<Object>) => void;
+  onChangeStateSubscriber: (handler: (state?: RootState, payload?: Payload) => void) => void;
 };
 
 type Actions = {
   onClick: string;
 };
 
+type Payload = {
+  id?: number;
+  title?: string;
+  init?: boolean;
+  defaultItemParametrs?: ItemDefaultParametrs;
+};
+
 type BrowserEvent = MouseEvent & TouchEvent;
 
 export {
   UserOptionsType,
-  ItemDefaultState,
+	ItemDefaultParametrsType,
   RootState,
-	DefaultItem,
+  DefaultItem,
   ItemValueType,
   DefaultItemDomOptions,
   DropdownDomOptions,
   Actions,
   BrowserEvent,
+  Payload,
 };

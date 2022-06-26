@@ -2,7 +2,10 @@
 // eslint-disable-next-line no-shadow
 enum ChangeStateTypes {
   addButtonClicked = 'addButtonClicked',
-	subButtonClicked = 'subButtonClicked',
+  subButtonClicked = 'subButtonClicked',
+  changeTitle = 'changeTitle',
+  changeDefaultItem = 'changeDefaultItem',
+	init = 'init'
 }
 
 export default ChangeStateTypes;

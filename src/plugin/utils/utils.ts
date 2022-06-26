@@ -1,10 +1,10 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable guard-for-in */
 
-import { UserOptions } from '../../models/interfaces';
+import { ItemDefaultParametrs, UserOptions } from '../../models/interfaces';
 import { BrowserEvent } from '../../models/types';
 
-function deepMerge<T extends UserOptions>(target: T, allowAddOptions: boolean, ...objects: Array<UserOptions>): T {
+function deepMerge<T extends UserOptions | ItemDefaultParametrs>(target: T, allowAddOptions: boolean, ...objects: Array<UserOptions | ItemDefaultParametrs>): T {
   const keys: (keyof T)[] = Object.keys(target);
   objects
     .filter((o) => o)

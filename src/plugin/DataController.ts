@@ -1,7 +1,7 @@
 import ChangeStateTypes from '../models/enums/ChangeStateTypes';
 import PluginActions from '../models/enums/PluginActions';
-import { DropdownOptions, UserOptions } from '../models/interfaces';
-import { Actions, ItemDefaultState, RootState } from '../models/types';
+import { DropdownOptions, ItemDefaultState, UserOptions } from '../models/interfaces';
+import { Actions, Payload, RootState } from '../models/types';
 import { deepMerge } from './utils/utils';
 
 class DataController {
@@ -33,33 +33,66 @@ class DataController {
     return this.numberOfDefaultItems;
   };
 
-  public changeState = (type: ChangeStateTypes, state: RootState, id?: number): RootState => {
-    if (id === undefined) {
+  public changeState = (type: ChangeStateTypes, state: RootState, payload?: Payload): RootState => {
+    if (payload === undefined) {
       return state;
     }
-    let newState: RootState = state;
-    const { incrementStep } = this.options;
-    const { defaultStates } = newState;
+    const { id, title, defaultItemParametrs } = payload;
+    let newState: RootState;
+    const { externalCheckState } = this.options;
 
     switch (type) {
       case ChangeStateTypes.addButtonClicked: {
-        defaultStates[id].value += incrementStep;
-				defaultStates[id] = this.checkState(defaultStates[id])
-        this.trigger(PluginActions.onChangeState, newState, id);
+        if (id === undefined) {
+          return state;
+        }
+        newState = this.checkState(state, id, true);
+        if (externalCheckState !== undefined) {
+          newState = externalCheckState(newState, id);
+        }
+        this.trigger(PluginActions.onChangeState, newState, payload);
         return newState;
       }
       case ChangeStateTypes.subButtonClicked: {
-        defaultStates[id].value -= incrementStep;
-				defaultStates[id] = this.checkState(defaultStates[id])
-        this.trigger(PluginActions.onChangeState, newState, id);
+        if (id === undefined) {
+          return state;
+        }
+        newState = this.checkState(state, id, false);
+        if (externalCheckState !== undefined) {
+          newState = externalCheckState(newState, id);
+        }
+        this.trigger(PluginActions.onChangeState, newState, payload);
         return newState;
+      }
+      case ChangeStateTypes.changeTitle: {
+        if (title === undefined) {
+          return state;
+        }
+        state.title = title;
+        this.trigger(PluginActions.onChangeState, state, payload);
+        return state;
+      }
+
+      case ChangeStateTypes.changeDefaultItem: {
+        const { defaultStates } = state;
+        if (defaultItemParametrs === undefined || id === undefined) {
+          return state;
+        }
+        let item = defaultStates[id];
+        item = deepMerge(item, false, defaultItemParametrs);
+        defaultStates[id] = this.checkDefaultItem(item);
+				if (externalCheckState !== undefined) {
+          state = externalCheckState(state, id);
+        }
+				this.trigger(PluginActions.onChangeState, state, payload);
+        return state;
       }
     }
     return state;
   };
   private updateOptions = (newOptions?: UserOptions): void => {
     if (newOptions) {
-      this.options = deepMerge(this.options, false, newOptions);
+      this.options = deepMerge(this.options, true, newOptions);
     }
   };
 
@@ -71,20 +104,37 @@ class DataController {
       return 1;
     }
   };
-  private checkState = (defaultState: ItemDefaultState): ItemDefaultState => {
-    const { minValue, maxValue, value } = defaultState;
+  private checkState = (state: RootState, id: number, add: boolean): RootState => {
+    const { incrementStep } = this.options;
+    const { defaultStates } = state;
+    const item = defaultStates[id];
+    const { minValue, maxValue } = item;
+    let { value } = item;
+    add ? (value += incrementStep) : (value -= incrementStep);
+    item.value = value;
+    defaultStates[id] = this.checkDefaultItem(item);
+    return state;
+  };
+
+  private checkDefaultItem = (item: ItemDefaultState): ItemDefaultState => {
+    const { minValue, maxValue } = item;
+    let { value } = item;
     if (value < minValue) {
-      defaultState.value = minValue;
+      item.value = minValue;
     }
     if (value > maxValue) {
-      defaultState.value = maxValue;
+      item.value = maxValue;
     }
-    return defaultState;
+    return item;
   };
 
   public initState = (): RootState => {
-    const { itemNames, startValues, minValueItem, maxValueItem, titlePlaceholder } = this.options;
+    const { itemNames, startValues, minValueItem, maxValueItem, titlePlaceholder, externalCheckState } = this.options;
     const itemStates: Array<ItemDefaultState> = [];
+    let state: RootState = {
+      title: titlePlaceholder,
+      defaultStates: itemStates,
+    };
 
     if (Array.isArray(itemNames)) {
       itemNames.forEach((itemName, index) => {
@@ -104,6 +154,9 @@ class DataController {
           itemState.value = startValues;
         }
         itemStates.push(itemState);
+        if (externalCheckState !== undefined) {
+          state = externalCheckState(state, index);
+        }
       });
     } else {
       const itemState: ItemDefaultState = {
@@ -120,11 +173,11 @@ class DataController {
         itemState.value = startValues;
       }
       itemStates.push(itemState);
+      if (externalCheckState !== undefined) {
+        state = externalCheckState(state, 0);
+      }
     }
-    return {
-      title: titlePlaceholder,
-      defaultStates: itemStates,
-    };
+    return state;
   };
 }
 

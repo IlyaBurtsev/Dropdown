@@ -1,6 +1,6 @@
 import ChangeStateTypes from '../models/enums/ChangeStateTypes';
 import PluginActions from '../models/enums/PluginActions';
-import { Actions, BrowserEvent } from '../models/types';
+import { Actions, BrowserEvent, Payload } from '../models/types';
 import { bindEvents, checkTouchByClassName } from './utils/utils';
 
 class DropdownListener {
@@ -38,18 +38,18 @@ class DropdownListener {
   };
 
   private detectEvent = (element: HTMLElement): void => {
-    let id = -1;
+    const payload: Payload = {}
     if (element.classList.contains(this.addButtonClassName)) {
       if (element.getAttribute('id') !== null) {
-        id = Number(element.getAttribute('id'))
+        payload.id = Number(element.getAttribute('id'))
       }
-      this.trigger(PluginActions.onClickAddButton, id);
+      this.trigger(PluginActions.onClickAddButton, payload);
     }
     if (element.classList.contains(this.subButtonClassName)) {
 			if (element.getAttribute('id') !== null) {
-        id = Number(element.getAttribute('id'))
+        payload.id = Number(element.getAttribute('id'))
       }
-      this.trigger(PluginActions.onClickSubButton, id);
+      this.trigger(PluginActions.onClickSubButton, payload);
     }
   };
 }

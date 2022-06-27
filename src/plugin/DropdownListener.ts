@@ -1,6 +1,6 @@
 import ChangeStateTypes from '../models/enums/ChangeStateTypes';
 import PluginActions from '../models/enums/PluginActions';
-import { Actions, BrowserEvent, Payload } from '../models/types';
+import { Actions, BrowserEvent, DefaultItem, Payload } from '../models/types';
 import { bindEvents, checkTouchByClassName } from './utils/utils';
 
 class DropdownListener {

@@ -51,8 +51,13 @@ const param: ItemDefaultParametrs = {
   maxValue: 7,
   itemName: 'XXX',
 };
+const onChangeState = (state: RootState):void => {
+const {defaultStates} = state
+console.log(defaultStates)
+}
 plugin.changeDefaulItemParametrs(param, 1);
 param.itemName = 'YYY';
 param.value = 0;
 param.minValue = -1;
 plugin.changeDefaulItemParametrs(param, 2);
+plugin.onChangeState(onChangeState)

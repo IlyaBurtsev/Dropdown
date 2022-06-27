@@ -120,10 +120,20 @@ const createDropdownPlugin = (viewConnector: ViewConnector, options?: UserOption
     dropdownPlugin.trigger(PluginActions.onChangeDefaultItemParametrs, payload);
   };
 
+	const getStateSubscriber = (handler: (state?: RootState) => void, subscribe = true): void => {
+    if (subscribe) {
+      dropdownPlugin.on(PluginActions.onChangeState, handler);
+			subscribers.set(PluginActions.onChangeState, handler)
+    } else {
+      dropdownPlugin.off(PluginActions.onChangeState, handler);
+    }
+  };
+
   const api: API = {
     updateDropdownOptions: updateDropdownOptions,
     changeTitle: changeTitle,
     changeDefaulItemParametrs: changeDefaulItemParametrs,
+		onChangeState: getStateSubscriber
   };
   return api;
 };

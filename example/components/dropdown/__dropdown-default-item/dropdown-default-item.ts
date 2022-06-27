@@ -1,3 +1,4 @@
+import { DefaultItem } from '../../../../src/models/types';
 import './dropdown-default-item.scss';
 
 const className = {

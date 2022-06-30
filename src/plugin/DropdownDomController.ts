@@ -1,3 +1,4 @@
+import ChangeStateTypes from '../models/enums/ChangeStateTypes';
 import { DropdownDomOptions, Payload, RootState } from '../models/types';
 import DropdownListener from './DropdownListener';
 
@@ -10,7 +11,7 @@ class DropdownDomController {
   private closedDropdown: Function;
   constructor(options: DropdownDomOptions) {
     const { viewConnector, getEventNames, trigger, onChangeStateSubscriber } = options;
-    const { dropdown, defaultItem, openDropdown, closedDropdown, setValueToInput } = viewConnector;
+    const { dropdown, item: defaultItem, openDropdown, closedDropdown, setValueToInput } = viewConnector;
     this.dropdownListener = new DropdownListener(dropdown, defaultItem, getEventNames, trigger);
     this.dropdown = dropdown;
     this.setValueToInput = setValueToInput;
@@ -24,15 +25,15 @@ class DropdownDomController {
   }
 
   private onChangeState = (state: RootState, payload: Payload): void => {
-		const {title, init} = payload
-		if (init === true) {
-			const { title } = state;
-			this.setValueToInput(title);
-		}else {
-			if (title !== undefined) {
-				this.setValueToInput(title)
-			}
-		}
+    const { changeType, title } = payload;
+    if (changeType === ChangeStateTypes.init) {
+      const { title } = state;
+      this.setValueToInput(title);
+    } else {
+      if (title !== undefined) {
+        this.setValueToInput(title);
+      }
+    }
   };
 
   private onFocus = (e: MouseEvent): void => {

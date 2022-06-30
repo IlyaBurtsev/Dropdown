@@ -1,11 +1,11 @@
-import { ItemDefaultParametrs, UserOptions } from './interfaces';
+import { ItemParametrs, UserOptions } from './interfaces';
 import { Payload, RootState } from './types';
 
 interface API {
   updateDropdownOptions: (options: UserOptions) => void;
   changeTitle: (title: string) => void;
-  changeDefaulItemParametrs: (parametrs: ItemDefaultParametrs, id: number) => void;
-  onChangeState: (handler: (state?: RootState) => void, subscribe?: boolean) => void;
+  changeItemParametrs: (parametrs: ItemParametrs, id: number) => void;
+  subscribeToChangeState: (handler: (state?: RootState, payload?: Payload) => void, subscribe?: boolean) => void;
 }
 
 export default API;

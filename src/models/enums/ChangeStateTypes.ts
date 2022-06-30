@@ -4,8 +4,8 @@ enum ChangeStateTypes {
   addButtonClicked = 'addButtonClicked',
   subButtonClicked = 'subButtonClicked',
   changeTitle = 'changeTitle',
-  changeDefaultItem = 'changeDefaultItem',
-	init = 'init'
+  changeItem = 'changeItem',
+  init = 'init',
 }
 
 export default ChangeStateTypes;

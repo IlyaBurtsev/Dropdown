@@ -5,18 +5,17 @@ import './components/dropdown/dropdown.ts';
 import ViewConnector from '../src/models/ViewConnector';
 import { initDropdown, switchButtonToActive, switchButtonToDisable } from './components/dropdown/dropdown';
 import createDropdownPlugin from '../src/plugin/Plugin';
-import { RootState } from '../src/models/types';
-import { ItemDefaultParametrs } from '../src/models/interfaces';
+import { Payload, RootState } from '../src/models/types';
+import { ItemParametrs } from '../src/models/interfaces';
 
 const element = <HTMLElement>document.querySelector('.custom-dropdown');
 const view: ViewConnector = initDropdown(element);
 const { dropdown } = view;
 
-const checkState = (state: RootState, id: number): RootState => {
-  const { defaultStates } = state;
+const checkState = (state: RootState, id: number, changeStateType: string): RootState => {
+  const { itemStates: defaultStates } = state;
   const currentItem = defaultStates[id];
   const { minValue, maxValue, value } = currentItem;
-
   if (value === minValue) {
     switchButtonToDisable(dropdown, id, false);
   } else {
@@ -31,7 +30,7 @@ const checkState = (state: RootState, id: number): RootState => {
 };
 
 const plugin = createDropdownPlugin(view, {
-  itemNames: ['kjlh', 'jklk'],
+  itemNames: ['kjlh'],
   titlePlaceholder: 'title',
   maxValueItem: 5,
   minValueItem: -2,
@@ -47,17 +46,20 @@ plugin.updateDropdownOptions({
 
 plugin.changeTitle('new');
 
-const param: ItemDefaultParametrs = {
+const param: ItemParametrs = {
   maxValue: 7,
   itemName: 'XXX',
 };
-const onChangeState = (state: RootState):void => {
-const {defaultStates} = state
-console.log(defaultStates)
-}
-plugin.changeDefaulItemParametrs(param, 1);
+const onChangeState = (state: RootState, payload: Payload): void => {
+  console.log(payload.changeType);
+};
+plugin.subscribeToChangeState(onChangeState);
+plugin.changeItemParametrs(param, 1);
 param.itemName = 'YYY';
 param.value = 0;
-param.minValue = -1;
-plugin.changeDefaulItemParametrs(param, 2);
-plugin.onChangeState(onChangeState)
+param.minValue = -2;
+param.maxValue = 8
+param.incrementStep = 2
+plugin.changeItemParametrs(param, 2);
+
+

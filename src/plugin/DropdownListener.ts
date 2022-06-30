@@ -1,6 +1,6 @@
 import ChangeStateTypes from '../models/enums/ChangeStateTypes';
 import PluginActions from '../models/enums/PluginActions';
-import { Actions, BrowserEvent, DefaultItem, Payload } from '../models/types';
+import { Actions, BrowserEvent, Item, Payload } from '../models/types';
 import { bindEvents, checkTouchByClassName } from './utils/utils';
 
 class DropdownListener {
@@ -10,7 +10,7 @@ class DropdownListener {
   private subButtonClassName: string;
   constructor(
     dropdown: HTMLElement,
-    defaultItem: DefaultItem,
+    defaultItem: Item,
     getEventNames: () => Actions,
     trigger: (actions: PluginActions, ...args: Array<Object>) => void,
   ) {
@@ -38,18 +38,19 @@ class DropdownListener {
   };
 
   private detectEvent = (element: HTMLElement): void => {
-    const payload: Payload = {}
     if (element.classList.contains(this.addButtonClassName)) {
+      const payload: Payload = { changeType: ChangeStateTypes.addButtonClicked };
       if (element.getAttribute('id') !== null) {
-        payload.id = Number(element.getAttribute('id'))
+        payload.id = Number(element.getAttribute('id'));
       }
-      this.trigger(PluginActions.onClickAddButton, payload);
+      this.trigger(PluginActions.changeState, payload);
     }
     if (element.classList.contains(this.subButtonClassName)) {
-			if (element.getAttribute('id') !== null) {
-        payload.id = Number(element.getAttribute('id'))
+      const payload: Payload = { changeType: ChangeStateTypes.subButtonClicked };
+      if (element.getAttribute('id') !== null) {
+        payload.id = Number(element.getAttribute('id'));
       }
-      this.trigger(PluginActions.onClickSubButton, payload);
+      this.trigger(PluginActions.changeState, payload);
     }
   };
 }

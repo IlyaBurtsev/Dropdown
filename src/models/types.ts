@@ -1,5 +1,5 @@
 import PluginActions from './enums/PluginActions';
-import { ItemDefaultParametrs, ItemDefaultState } from './interfaces';
+import { ItemParametrs, ItemState } from './interfaces';
 import ViewConnector from './ViewConnector';
 
 type UserOptionsType =
@@ -8,17 +8,17 @@ type UserOptionsType =
   | Array<number>
   | Array<string>
   | boolean
-  | ((state: RootState, id: number) => RootState)
+  | ((state: RootState, id: number, type: string) => RootState)
   | undefined;
 
-type ItemDefaultParametrsType = string | number | undefined;
+type ItemParametrsType = string | number | undefined;
 
 type RootState = {
   title: string;
-  defaultStates: Array<ItemDefaultState>;
+  itemStates: Array<ItemState>;
 };
 
-type DefaultItem = {
+type Item = {
   container: HTMLElement;
   addButtonClassName: string;
   subButtonClassName: string;
@@ -28,10 +28,9 @@ type DefaultItem = {
 
 type ItemValueType = number;
 
-type DefaultItemDomOptions = {
+type ItemDomOptions = {
   viewConnector: ViewConnector;
   numberOfItems: number;
-  trigger: (actions: PluginActions, ...args: Array<Object>) => void;
   onDestroySubscriber: (handler: () => void) => void;
   onChangeStateSubscriber: (handler: (state?: RootState, payload?: Payload) => void) => void;
 };
@@ -48,21 +47,21 @@ type Actions = {
 };
 
 type Payload = {
+  changeType: string;
   id?: number;
   title?: string;
-  init?: boolean;
-  defaultItemParametrs?: ItemDefaultParametrs;
+  itemParametrs?: ItemParametrs;
 };
 
 type BrowserEvent = MouseEvent & TouchEvent;
 
 export {
   UserOptionsType,
-	ItemDefaultParametrsType,
+  ItemParametrsType,
   RootState,
-  DefaultItem,
+  Item,
   ItemValueType,
-  DefaultItemDomOptions,
+  ItemDomOptions,
   DropdownDomOptions,
   Actions,
   BrowserEvent,

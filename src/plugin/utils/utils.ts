@@ -1,10 +1,14 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable guard-for-in */
 
-import { ItemDefaultParametrs, UserOptions } from '../../models/interfaces';
+import { ItemParametrs, UserOptions } from '../../models/interfaces';
 import { BrowserEvent } from '../../models/types';
 
-function deepMerge<T extends UserOptions | ItemDefaultParametrs>(target: T, allowAddOptions: boolean, ...objects: Array<UserOptions | ItemDefaultParametrs>): T {
+function deepMerge<T extends UserOptions | ItemParametrs>(
+  target: T,
+  allowAddOptions: boolean,
+  ...objects: Array<UserOptions | ItemParametrs>
+): T {
   const keys: (keyof T)[] = Object.keys(target);
   objects
     .filter((o) => o)
@@ -124,7 +128,7 @@ function isTouchOnTargetByClassName(event: BrowserEvent, classNames: Array<strin
   const target: HTMLElement = currentTouch.target as HTMLElement;
   let result = false;
   classNames.forEach((clasName) => (result = target.classList.contains(clasName)));
-	return result;
+  return result;
 }
 
 // eslint-disable-next-line no-unused-vars
@@ -185,7 +189,7 @@ export {
   bindEvents,
   removeEvents,
   removeElementsFromDom,
-	checkTouchByClassName
+  checkTouchByClassName,
   // getTouchPosition,
   // checkTouch,
 };

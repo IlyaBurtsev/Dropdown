@@ -1,4 +1,4 @@
-import { DefaultItem } from '../../../../src/models/types';
+import { Item } from '../../../../src/models/types';
 import './dropdown-default-item.scss';
 
 const className = {
@@ -9,7 +9,7 @@ const className = {
   subButton: 'js-dropdown-item__sub-button',
   buttonActive: 'dropdown-item__button_active',
 };
-const initDefaultItem = (bindElement: HTMLElement): DefaultItem => {
+const initDefaultItem = (bindElement: HTMLElement): Item => {
   const container = <HTMLElement>bindElement.querySelector(`.${className.defaultItemContainer}`);
   if (container === null) {
     throw new Error('Default item container is null!');

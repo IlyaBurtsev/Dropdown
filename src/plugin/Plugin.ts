@@ -2,10 +2,10 @@ import PluginActions from '../models/enums/PluginActions';
 import ViewConnector from '../models/ViewConnector';
 import DataController from './DataController';
 import Observer from './observer/Observer';
-import { ItemDefaultParametrs, ItemDefaultState, UserOptions } from '../models/interfaces';
+import { ItemParametrs, ItemState, UserOptions } from '../models/interfaces';
 import ChangeStateTypes from '../models/enums/ChangeStateTypes';
 import DropdownDomController from './DropdownDomController';
-import DefaultItemDomController from './DefaultItemDomController';
+import ItemDomController from './ItemDomController';
 import { Payload, RootState } from '../models/types';
 import { deepMerge } from './utils/utils';
 import API from '../models/API';
@@ -13,28 +13,25 @@ import API from '../models/API';
 class Plugin extends Observer {
   private dataController: DataController;
   private dropdownController: DropdownDomController;
-  private defaultItemController: DefaultItemDomController;
+  private defaultItemController: ItemDomController;
   private state: RootState;
   constructor(viewConnector: ViewConnector, newOptions?: UserOptions) {
     super();
     this.init(viewConnector, newOptions);
-    this.on(PluginActions.onClickAddButton, this.onClickAddButton);
-    this.on(PluginActions.onClickSubButton, this.onClickSubButton);
-    this.on(PluginActions.onChangeTitle, this.onChangeTitle);
-    this.on(PluginActions.onChangeDefaultItemParametrs, this.onChangeDefaultItem);
+    this.on(PluginActions.changeState, this.changeState);
     this.on(PluginActions.onDestroy, this.onDestroy);
-    this.newTrigger(PluginActions.onChangeState, this.state, { init: true });
+    this.newTrigger(PluginActions.onChangeState, this.state, { changeType: ChangeStateTypes.init });
   }
 
   public getState = (): RootState => {
-    const { defaultStates, title } = this.state;
-    const defaultItemsState: Array<ItemDefaultState> = [];
+    const { itemStates: defaultStates, title } = this.state;
+    const defaultItemsState: Array<ItemState> = [];
     defaultStates.forEach((itemState) => {
       const cloneState = Object.assign(itemState);
       defaultItemsState.push(cloneState);
     });
     return {
-      defaultStates: defaultItemsState,
+      itemStates: defaultItemsState,
       title: title,
     };
   };
@@ -47,23 +44,18 @@ class Plugin extends Observer {
       trigger: this.newTrigger,
       onChangeStateSubscriber: this.getStateSubscriber,
     });
-    this.defaultItemController = new DefaultItemDomController({
+    this.defaultItemController = new ItemDomController({
       viewConnector: viewConnector,
       numberOfItems: this.dataController.getNumberOfDefaultItems(),
       onDestroySubscriber: this.addOnDestroySubscriber,
       onChangeStateSubscriber: this.getStateSubscriber,
-      trigger: this.newTrigger,
     });
-		this.state = this.dataController.initState();
+    this.state = this.dataController.initState();
   }
 
-  private onClickAddButton = this.changeStateMethodCreator(ChangeStateTypes.addButtonClicked);
-
-  private onClickSubButton = this.changeStateMethodCreator(ChangeStateTypes.subButtonClicked);
-
-  private onChangeTitle = this.changeStateMethodCreator(ChangeStateTypes.changeTitle);
-
-  private onChangeDefaultItem = this.changeStateMethodCreator(ChangeStateTypes.changeDefaultItem);
+  private changeState = (payload: Payload): void => {
+    this.state = this.dataController.changeState(this.state, payload);
+  };
 
   private newTrigger = (actions: PluginActions, ...args: Array<Object>): void => {
     this.trigger(actions, ...args);
@@ -80,12 +72,6 @@ class Plugin extends Observer {
   private addOnDestroySubscriber = (handler: () => void): void => {
     this.on(PluginActions.onDestroy, handler);
   };
-
-  private changeStateMethodCreator(type: ChangeStateTypes): (payload: Payload) => void {
-    return (payload): void => {
-      this.state = this.dataController.changeState(type, this.state, payload);
-    };
-  }
 
   private onDestroy = (): void => {
     this.removeAllEvents();
@@ -111,19 +97,23 @@ const createDropdownPlugin = (viewConnector: ViewConnector, options?: UserOption
   };
 
   const changeTitle = (title: string): void => {
-    const payload: Payload = { title: title };
-    dropdownPlugin.trigger(PluginActions.onChangeTitle, payload);
+    const payload: Payload = { changeType: ChangeStateTypes.changeTitle, title: title };
+    dropdownPlugin.trigger(PluginActions.changeState, payload);
   };
 
-  const changeDefaulItemParametrs = (parametrs: ItemDefaultParametrs, id: number, ): void => {
-    const payload: Payload = { id: id, defaultItemParametrs: parametrs };
-    dropdownPlugin.trigger(PluginActions.onChangeDefaultItemParametrs, payload);
+  const changeItemParametrs = (parametrs: ItemParametrs, id: number): void => {
+    const payload: Payload = {
+      changeType: ChangeStateTypes.changeItem,
+      id: id,
+      itemParametrs: parametrs,
+    };
+    dropdownPlugin.trigger(PluginActions.changeState, payload);
   };
 
-	const getStateSubscriber = (handler: (state?: RootState) => void, subscribe = true): void => {
+  const getStateSubscriber = (handler: (state?: RootState, payload?: Payload) => void, subscribe = true): void => {
     if (subscribe) {
       dropdownPlugin.on(PluginActions.onChangeState, handler);
-			subscribers.set(PluginActions.onChangeState, handler)
+      subscribers.set(PluginActions.onChangeState, handler);
     } else {
       dropdownPlugin.off(PluginActions.onChangeState, handler);
     }
@@ -132,8 +122,8 @@ const createDropdownPlugin = (viewConnector: ViewConnector, options?: UserOption
   const api: API = {
     updateDropdownOptions: updateDropdownOptions,
     changeTitle: changeTitle,
-    changeDefaulItemParametrs: changeDefaulItemParametrs,
-		onChangeState: getStateSubscriber
+    changeItemParametrs: changeItemParametrs,
+    subscribeToChangeState: getStateSubscriber,
   };
   return api;
 };

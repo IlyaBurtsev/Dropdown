@@ -1,6 +1,6 @@
 import ChangeStateTypes from '../models/enums/ChangeStateTypes';
 import PluginActions from '../models/enums/PluginActions';
-import { DropdownOptions, ItemDefaultState, UserOptions } from '../models/interfaces';
+import { DropdownOptions, ItemState, UserOptions } from '../models/interfaces';
 import { Actions, Payload, RootState } from '../models/types';
 import { deepMerge } from './utils/utils';
 
@@ -33,22 +33,19 @@ class DataController {
     return this.numberOfDefaultItems;
   };
 
-  public changeState = (type: ChangeStateTypes, state: RootState, payload?: Payload): RootState => {
-    if (payload === undefined) {
-      return state;
-    }
-    const { id, title, defaultItemParametrs } = payload;
+  public changeState = (state: RootState, payload: Payload): RootState => {
+    const { changeType, id, title, itemParametrs: defaultItemParametrs } = payload;
     let newState: RootState;
     const { externalCheckState } = this.options;
 
-    switch (type) {
+    switch (changeType) {
       case ChangeStateTypes.addButtonClicked: {
         if (id === undefined) {
           return state;
         }
         newState = this.checkState(state, id, true);
         if (externalCheckState !== undefined) {
-          newState = externalCheckState(newState, id);
+          newState = externalCheckState(newState, id, changeType);
         }
         this.trigger(PluginActions.onChangeState, newState, payload);
         return newState;
@@ -59,7 +56,7 @@ class DataController {
         }
         newState = this.checkState(state, id, false);
         if (externalCheckState !== undefined) {
-          newState = externalCheckState(newState, id);
+          newState = externalCheckState(newState, id, changeType);
         }
         this.trigger(PluginActions.onChangeState, newState, payload);
         return newState;
@@ -73,18 +70,18 @@ class DataController {
         return state;
       }
 
-      case ChangeStateTypes.changeDefaultItem: {
-        const { defaultStates } = state;
+      case ChangeStateTypes.changeItem: {
+        const { itemStates: defaultStates } = state;
         if (defaultItemParametrs === undefined || id === undefined) {
           return state;
         }
         let item = defaultStates[id];
         item = deepMerge(item, false, defaultItemParametrs);
-        defaultStates[id] = this.checkDefaultItem(item);
-				if (externalCheckState !== undefined) {
-          state = externalCheckState(state, id);
+        defaultStates[id] = this.checkItem(item);
+        if (externalCheckState !== undefined) {
+          state = externalCheckState(state, id, changeType);
         }
-				this.trigger(PluginActions.onChangeState, state, payload);
+        this.trigger(PluginActions.onChangeState, state, payload);
         return state;
       }
     }
@@ -105,18 +102,17 @@ class DataController {
     }
   };
   private checkState = (state: RootState, id: number, add: boolean): RootState => {
-    const { incrementStep } = this.options;
-    const { defaultStates } = state;
-    const item = defaultStates[id];
-    const { minValue, maxValue } = item;
+    const { itemStates } = state;
+    const item = itemStates[id];
+    const { incrementStep } = item;
     let { value } = item;
     add ? (value += incrementStep) : (value -= incrementStep);
     item.value = value;
-    defaultStates[id] = this.checkDefaultItem(item);
+    itemStates[id] = this.checkItem(item);
     return state;
   };
 
-  private checkDefaultItem = (item: ItemDefaultState): ItemDefaultState => {
+  private checkItem = (item: ItemState): ItemState => {
     const { minValue, maxValue } = item;
     let { value } = item;
     if (value < minValue) {
@@ -129,20 +125,21 @@ class DataController {
   };
 
   public initState = (): RootState => {
-    const { itemNames, startValues, minValueItem, maxValueItem, titlePlaceholder, externalCheckState } = this.options;
-    const itemStates: Array<ItemDefaultState> = [];
+    const { itemNames, startValues, minValueItem, maxValueItem, incrementStep, titlePlaceholder, externalCheckState } = this.options;
+    const itemStates: Array<ItemState> = [];
     let state: RootState = {
       title: titlePlaceholder,
-      defaultStates: itemStates,
+      itemStates: itemStates,
     };
 
     if (Array.isArray(itemNames)) {
       itemNames.forEach((itemName, index) => {
-        const itemState: ItemDefaultState = {
+        const itemState: ItemState = {
           itemName: itemName,
           minValue: minValueItem,
           maxValue: maxValueItem,
           value: 0,
+					incrementStep: incrementStep,
         };
         if (Array.isArray(startValues)) {
           if (startValues.length === itemNames.length) {
@@ -155,15 +152,16 @@ class DataController {
         }
         itemStates.push(itemState);
         if (externalCheckState !== undefined) {
-          state = externalCheckState(state, index);
+          state = externalCheckState(state, index, ChangeStateTypes.init);
         }
       });
     } else {
-      const itemState: ItemDefaultState = {
+      const itemState: ItemState = {
         itemName: itemNames,
         minValue: minValueItem,
         maxValue: maxValueItem,
         value: 0,
+				incrementStep: incrementStep,
       };
       if (Array.isArray(startValues)) {
         if (startValues.length === 1) {
@@ -174,7 +172,7 @@ class DataController {
       }
       itemStates.push(itemState);
       if (externalCheckState !== undefined) {
-        state = externalCheckState(state, 0);
+        state = externalCheckState(state, 0, ChangeStateTypes.init);
       }
     }
     return state;

@@ -1,4 +1,4 @@
-import { ItemDefaultParametrsType, ItemValueType, RootState, UserOptionsType } from './types';
+import { ItemParametrsType, ItemValueType, RootState, UserOptionsType } from './types';
 
 interface DataObject<T> {
   [id: string]: T;
@@ -11,7 +11,7 @@ interface UserOptions extends DataObject<UserOptionsType> {
   itemNames?: Array<string> | string;
   startValues?: Array<ItemValueType> | number;
   incrementStep?: number;
-	externalCheckState?: ((state : RootState, id: number) => RootState)
+	externalCheckState?: ((state : RootState, id: number, changeStateType: string) => RootState)
 }
 
 interface DropdownOptions extends UserOptions {
@@ -21,21 +21,23 @@ interface DropdownOptions extends UserOptions {
   itemNames: Array<string> | string;
   startValues: Array<ItemValueType> | number;
   incrementStep: number;
-	externalCheckState?: ((state : RootState, id: number) => RootState)
+	externalCheckState?: ((state : RootState, id: number, changeStateType: string) => RootState)
 }
 
-interface ItemDefaultParametrs extends DataObject<ItemDefaultParametrsType> {
+interface ItemParametrs extends DataObject<ItemParametrsType> {
   itemName?: string;
   minValue?: number;
   maxValue?: number;
   value?: number;
+	incrementStep?: number;
 };
 
-interface ItemDefaultState extends ItemDefaultParametrs {
+interface ItemState extends ItemParametrs {
   itemName: string;
   minValue: number;
   maxValue: number;
   value: number;
+	incrementStep: number;
 };
 
-export { DataObject, UserOptions, DropdownOptions, ItemDefaultParametrs, ItemDefaultState };
+export { DataObject, UserOptions, DropdownOptions, ItemParametrs, ItemState };

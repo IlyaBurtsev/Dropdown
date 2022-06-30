@@ -30,7 +30,7 @@ const initDropdown = (bindElement: HTMLElement): ViewConnector => {
     setValueToInput: setValueToInput,
     openDropdown: openDropdown,
     closedDropdown: closeDropdown,
-    defaultItem: defaultItem,
+    item: defaultItem,
   };
 };
 

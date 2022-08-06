@@ -5,6 +5,7 @@ interface DataObject<T> {
 }
 
 interface UserOptions extends DataObject<UserOptionsType> {
+	autoClose?: boolean;
   titlePlaceholder?: string;
   minValueItem?: number;
   maxValueItem?: number;
@@ -15,6 +16,7 @@ interface UserOptions extends DataObject<UserOptionsType> {
 }
 
 interface DropdownOptions extends UserOptions {
+	autoClose: boolean;
   titlePlaceholder: string;
   minValueItem: number;
   maxValueItem: number;

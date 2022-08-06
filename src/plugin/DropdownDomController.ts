@@ -10,7 +10,7 @@ class DropdownDomController {
   private openDropdown: Function;
   private closedDropdown: Function;
   constructor(options: DropdownDomOptions) {
-    const { viewConnector, getEventNames, trigger, onChangeStateSubscriber } = options;
+    const { viewConnector, getEventNames, trigger, onChangeStateSubscriber , autoClose} = options;
     const { dropdown, item: defaultItem, openDropdown, closedDropdown, setValueToInput } = viewConnector;
     this.dropdownListener = new DropdownListener(dropdown, defaultItem, getEventNames, trigger);
     this.dropdown = dropdown;
@@ -19,10 +19,17 @@ class DropdownDomController {
     this.openDropdown = openDropdown;
     this.closedDropdown = closedDropdown;
     dropdown.tabIndex = 0;
-    dropdown.addEventListener('focusin', this.onFocus, true);
-    dropdown.addEventListener('blur', this.onBlur);
-    onChangeStateSubscriber(this.onChangeState);
+		onChangeStateSubscriber(this.onChangeState);
+		dropdown.addEventListener('focusin', this.onFocus, true);
+		if (autoClose) {
+			dropdown.addEventListener('blur', this.onBlur);
+		}
   }
+
+	public handleClosedDropdown = (): void =>{
+		this.closedDropdown();
+		this.dropdown.blur()
+	}
 
   private onChangeState = (state: RootState, payload: Payload): void => {
     const { changeType, title } = payload;

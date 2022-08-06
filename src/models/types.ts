@@ -36,6 +36,7 @@ type ItemDomOptions = {
 };
 
 type DropdownDomOptions = {
+	autoClose: boolean;
   viewConnector: ViewConnector;
   getEventNames: () => Actions;
   trigger: (actions: PluginActions, ...args: Array<Object>) => void;

@@ -11,6 +11,7 @@ import { ItemParametrs } from '../src/models/interfaces';
 const element = <HTMLElement>document.querySelector('.custom-dropdown');
 const view: ViewConnector = initDropdown(element);
 const { dropdown } = view;
+const btn =  <HTMLElement>document.querySelector('.test');
 
 const checkState = (state: RootState, id: number, changeStateType: string): RootState => {
   const { itemStates: defaultStates } = state;

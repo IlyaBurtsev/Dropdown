@@ -35,10 +35,12 @@ class Plugin extends Observer {
       title: title,
     };
   };
+
   private init(viewConnector: ViewConnector, newOptions?: UserOptions): void {
     this.dataController = new DataController(this.newTrigger, newOptions);
 
     this.dropdownController = new DropdownDomController({
+			autoClose: this.dataController.autoClose(),
       viewConnector: viewConnector,
       getEventNames: this.dataController.getActions,
       trigger: this.newTrigger,
@@ -52,6 +54,10 @@ class Plugin extends Observer {
     });
     this.state = this.dataController.initState();
   }
+
+	public closedDropdown = (): void => {
+		this.dropdownController.handleClosedDropdown();
+	}
 
   private changeState = (payload: Payload): void => {
     this.state = this.dataController.changeState(this.state, payload);
@@ -124,6 +130,7 @@ const createDropdownPlugin = (viewConnector: ViewConnector, options?: UserOption
     changeTitle: changeTitle,
     changeItemParametrs: changeItemParametrs,
     subscribeToChangeState: getStateSubscriber,
+		closedDropdown: dropdownPlugin.closedDropdown
   };
   return api;
 };

@@ -8,6 +8,7 @@ class DataController {
   private numberOfDefaultItems: number;
   private trigger: (actions: PluginActions, ...args: Array<Object>) => void;
   private options: DropdownOptions = {
+		autoClose: true,
     titlePlaceholder: '',
     minValueItem: 0,
     maxValueItem: 100,
@@ -32,6 +33,11 @@ class DataController {
   public getNumberOfDefaultItems = (): number => {
     return this.numberOfDefaultItems;
   };
+
+	public autoClose = (): boolean => {
+		const {autoClose} = this.options
+		return autoClose;
+	}
 
   public changeState = (state: RootState, payload: Payload): RootState => {
     const { changeType, id, title, itemParametrs: defaultItemParametrs } = payload;

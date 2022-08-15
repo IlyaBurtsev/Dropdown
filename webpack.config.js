@@ -7,7 +7,7 @@ module.exports = (env, argv = {}) => {
   const { mode = 'development' } = argv;
   const isProduction = mode === 'production';
   const isDevelopment = mode === 'development';
-  const pagesDir = path.resolve(__dirname, 'example');
+  const pagesDir = path.resolve(__dirname);
 
   const getStyleLoaders = () => {
     return [
@@ -19,13 +19,30 @@ module.exports = (env, argv = {}) => {
     const plugins = [
       new webpack.ProgressPlugin(),
       new HtmlWebpackPlugin({
-        template: `${pagesDir}/example.pug`,
+        template: `${pagesDir}/example/example.pug`,
+				minify: isProduction
+          ? {
+              html5: true,
+              collapseWhitespace: true,
+              minifyCSS: true,
+              minifyJS: true,
+              minifyURLs: false,
+              removeAttributeQuotes: false,
+              removeComments: true,
+              removeEmptyAttributes: true,
+              removeOptionalTags: true,
+              removeRedundantAttributes: false,
+              removeScriptTypeAttributes: true,
+              removeStyleLinkTypeAttributese: true,
+              useShortDoctype: true,
+            }
+          : false,
       }),
     ];
     if (isProduction) {
       plugins.push(
         new MiniCssExtractPlugin({
-          filename: '[name].css?version=[contenthash]',
+          filename: 'dropdown.css',
           chunkFilename: '[id].css?version=[contenthash]',
         })
       );
@@ -35,11 +52,19 @@ module.exports = (env, argv = {}) => {
   return {
     mode: isProduction ? 'production' : 'development',
     output: {
-      filename: '[name].js?version=[hash]',
-      assetModuleFilename: 'assets/[name][ext]',
-      clean: true,
+			path: path.resolve(__dirname, 'dropdown'),
+			filename: isDevelopment ? 'js/[name].js' : `dropdown.js`,
+			publicPath: '/',
+			chunkFilename: 'js/[name].js',
+			library: isDevelopment ? undefined : 'Dropdown',
+			libraryTarget: isDevelopment ? undefined : 'umd',
+			libraryExport: isDevelopment ? undefined : 'default',
+			globalObject: 'this',
+			clean: true,
     },
-    entry: `${pagesDir}/example.ts`,
+    entry: {
+			index:  isDevelopment ? `${pagesDir}/example/example.ts` : `${pagesDir}/src/dropdown.ts`,
+		},
 		resolve: {
 			extensions: ['.js', '.ts', '.scss'],
 		},
@@ -47,7 +72,10 @@ module.exports = (env, argv = {}) => {
       rules: [
 				{
           test: /\.ts$/,
-          use: 'ts-loader',
+          loader: 'ts-loader',
+					options: {
+						configFile: isDevelopment? "tsconfig.json" : "tsconfig.build.json",
+          },
         },
         {
           test: /\.css$/,

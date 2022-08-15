@@ -1,14 +1,15 @@
-import PluginActions from '../models/enums/PluginActions';
-import ViewConnector from '../models/ViewConnector';
-import DataController from './DataController';
-import Observer from './observer/Observer';
-import { ItemParametrs, ItemState, UserOptions } from '../models/interfaces';
-import ChangeStateTypes from '../models/enums/ChangeStateTypes';
-import DropdownDomController from './DropdownDomController';
-import ItemDomController from './ItemDomController';
-import { Payload, RootState } from '../models/types';
-import { deepMerge } from './utils/utils';
-import API from '../models/API';
+import PluginActions from './models/enums/PluginActions';
+import ViewConnector from './models/ViewConnector';
+import DataController from './plugin/DataController';
+import Observer from './plugin/observer/Observer';
+import { ItemParametrs, ItemState, UserOptions } from './models/interfaces';
+import ChangeStateTypes from './models/enums/ChangeStateTypes';
+import DropdownDomController from './plugin/DropdownDomController';
+import ItemDomController from './plugin/ItemDomController';
+import { Payload, RootState } from './models/types';
+import { deepMerge } from './plugin/utils/utils';
+import API from './models/API';
+
 
 class Plugin extends Observer {
   private dataController: DataController;
@@ -40,7 +41,7 @@ class Plugin extends Observer {
     this.dataController = new DataController(this.newTrigger, newOptions);
 
     this.dropdownController = new DropdownDomController({
-			autoClose: this.dataController.autoClose(),
+      autoClose: this.dataController.autoClose(),
       viewConnector: viewConnector,
       getEventNames: this.dataController.getActions,
       trigger: this.newTrigger,
@@ -55,9 +56,9 @@ class Plugin extends Observer {
     this.state = this.dataController.initState();
   }
 
-	public closedDropdown = (): void => {
-		this.dropdownController.handleClosedDropdown();
-	}
+  public closedDropdown = (): void => {
+    this.dropdownController.handleClosedDropdown();
+  };
 
   private changeState = (payload: Payload): void => {
     this.state = this.dataController.changeState(this.state, payload);
@@ -130,7 +131,7 @@ const createDropdownPlugin = (viewConnector: ViewConnector, options?: UserOption
     changeTitle: changeTitle,
     changeItemParametrs: changeItemParametrs,
     subscribeToChangeState: getStateSubscriber,
-		closedDropdown: dropdownPlugin.closedDropdown
+    closedDropdown: dropdownPlugin.closedDropdown,
   };
   return api;
 };

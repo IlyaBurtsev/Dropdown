@@ -4,7 +4,7 @@ import './style/fonts.scss';
 import './components/dropdown/dropdown.ts';
 import ViewConnector from '../src/models/ViewConnector';
 import { initDropdown, switchButtonToActive, switchButtonToDisable } from './components/dropdown/dropdown';
-import createDropdownPlugin from '../src/plugin/Plugin';
+import createDropdownPlugin from '../src/dropdown';
 import { Payload, RootState } from '../src/models/types';
 import { ItemParametrs } from '../src/models/interfaces';
 

@@ -10,6 +10,7 @@ import { Payload, RootState } from './models/types';
 import { deepMerge } from './plugin/utils/utils';
 import API from './models/API';
 
+
 class Plugin extends Observer {
   private dataController: DataController;
   private dropdownController: DropdownDomController;

@@ -4,7 +4,7 @@ import './style/fonts.scss';
 import './components/dropdown/dropdown.ts';
 import ViewConnector from '../src/models/ViewConnector';
 import { initDropdown, switchButtonToActive, switchButtonToDisable } from './components/dropdown/dropdown';
-import createDropdownPlugin from '../src/plugin/Plugin';
+import dropdownCreator from '../src/dropdown';
 import { Payload, RootState } from '../src/models/types';
 import { ItemParametrs } from '../src/models/interfaces';
 
@@ -12,6 +12,7 @@ const element = <HTMLElement>document.querySelector('.custom-dropdown');
 const view: ViewConnector = initDropdown(element);
 const { dropdown } = view;
 const btn =  <HTMLElement>document.querySelector('.test');
+const {createDropdownPlugin, ChangeStateTypes} = dropdownCreator
 
 const checkState = (state: RootState, id: number, changeStateType: string): RootState => {
   const { itemStates: defaultStates } = state;

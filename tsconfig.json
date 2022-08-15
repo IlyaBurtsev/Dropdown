@@ -6,7 +6,7 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "strictNullChecks": true,
-    "outDir": "dist"
+    "outDir": "dropdown"
   },
   "exclude": ["node_modules"]
 }
